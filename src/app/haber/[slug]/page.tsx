@@ -27,8 +27,9 @@ async function getIlgiliHaberler(haber: Haber): Promise<Haber[]> {
   return data || []
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const haber = await getHaber(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const haber = await getHaber(slug)
   if (!haber) return { title: 'Haber bulunamadı — Silikon Zeka' }
 
   return {
@@ -76,8 +77,9 @@ function formatTarih(tarih: string) {
   })
 }
 
-export default async function HaberDetay({ params }: { params: { slug: string } }) {
-  const haber = await getHaber(params.slug)
+export default async function HaberDetay({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const haber = await getHaber(slug)
   if (!haber) notFound()
 
   const ilgili = await getIlgiliHaberler(haber)
@@ -88,7 +90,6 @@ export default async function HaberDetay({ params }: { params: { slug: string } 
     <div style={{ background: 'var(--bg)', minHeight: '100vh' }}>
       <Header />
 
-      {/* JSON-LD structured data for Google */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -112,21 +113,17 @@ export default async function HaberDetay({ params }: { params: { slug: string } 
 
       <div style={{ maxWidth: 600, margin: '0 auto' }}>
 
-        {/* Geri butonu */}
         <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid var(--border)' }}>
           <a href="/" style={{
             display: 'inline-flex', alignItems: 'center', gap: '0.4rem',
             fontSize: '0.82rem', color: 'var(--muted)',
-            transition: 'color 0.15s',
           }}>
             ← Ana Sayfa
           </a>
         </div>
 
-        {/* Haber içeriği */}
         <article style={{ padding: '1.5rem 1rem' }}>
 
-          {/* Meta */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
             <span style={{
               fontSize: '0.6rem', fontFamily: 'Space Mono', fontWeight: 700,
@@ -141,14 +138,12 @@ export default async function HaberDetay({ params }: { params: { slug: string } 
             )}
           </div>
 
-          {/* Başlık */}
           <h1 style={{
             fontSize: '1.5rem', fontWeight: 800,
             lineHeight: 1.3, marginBottom: '0.75rem',
             letterSpacing: '-0.02em',
           }}>{haber.baslik}</h1>
 
-          {/* Tarih + kaynak */}
           <div style={{
             display: 'flex', alignItems: 'center', gap: '0.75rem',
             marginBottom: '1.25rem',
@@ -158,7 +153,6 @@ export default async function HaberDetay({ params }: { params: { slug: string } 
             {haber.kaynak && <span>📰 {haber.kaynak}</span>}
           </div>
 
-          {/* Özet kutusu */}
           <div style={{
             background: 'var(--surface2)',
             border: '1px solid var(--border)',
@@ -172,7 +166,6 @@ export default async function HaberDetay({ params }: { params: { slug: string } 
             {haber.ozet}
           </div>
 
-          {/* İçerik (sosyal medya uyarlaması varsa) */}
           {haber.icerik && (
             <div style={{
               fontSize: '0.88rem', lineHeight: 1.75,
@@ -184,9 +177,8 @@ export default async function HaberDetay({ params }: { params: { slug: string } 
             </div>
           )}
 
-          {/* Kaynak linki */}
           {haber.url && (
-            <a
+            
               href={haber.url}
               target="_blank"
               rel="noopener noreferrer"
@@ -195,21 +187,18 @@ export default async function HaberDetay({ params }: { params: { slug: string } 
                 padding: '0.6rem 1.1rem', borderRadius: 8,
                 border: '1px solid var(--border)',
                 fontSize: '0.78rem', fontWeight: 600,
-                color: 'var(--accent2)', transition: 'all 0.15s',
+                color: 'var(--accent2)',
               }}
             >
               🔗 Orijinal Kaynağa Git →
             </a>
           )}
 
-          {/* Silikon Zeka tanıtım kutusu */}
           <div style={{
-            marginTop: '2rem',
-            padding: '1rem',
+            marginTop: '2rem', padding: '1rem',
             background: 'linear-gradient(135deg, rgba(108,99,255,0.08), rgba(0,229,255,0.05))',
             border: '1px solid rgba(108,99,255,0.2)',
-            borderRadius: 12,
-            textAlign: 'center',
+            borderRadius: 12, textAlign: 'center',
           }}>
             <div style={{ fontWeight: 800, fontSize: '0.95rem', marginBottom: '0.4rem' }}>
               <span style={{ color: 'var(--accent)' }}>Silikon</span> Zeka&apos;yı takip et
@@ -218,7 +207,7 @@ export default async function HaberDetay({ params }: { params: { slug: string } 
               Yapay zeka haberleri karmaşık. Biz sadeleştiriyoruz.<br />
               Tüm dünyadan en önemli AI gelişmeleri — Türkçe, anlaşılır, güncel.
             </p>
-            <a
+            
               href="https://instagram.com/silikonzeka"
               target="_blank"
               rel="noopener noreferrer"
@@ -234,7 +223,6 @@ export default async function HaberDetay({ params }: { params: { slug: string } 
           </div>
         </article>
 
-        {/* İlgili haberler */}
         {ilgili.length > 0 && (
           <>
             <div style={{
@@ -250,7 +238,6 @@ export default async function HaberDetay({ params }: { params: { slug: string } 
           </>
         )}
 
-        {/* Footer */}
         <div style={{
           padding: '2rem 1rem',
           borderTop: '1px solid var(--border)',
