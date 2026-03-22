@@ -27,8 +27,9 @@ async function getIlgiliHaberler(haber: Haber): Promise<Haber[]> {
   return data || []
 }
 
-export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const haber = await getHaber(params.slug)
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params
+  const haber = await getHaber(slug)
   if (!haber) return { title: 'Haber bulunamadı — Silikon Zeka' }
 
   return {
@@ -76,8 +77,9 @@ function formatTarih(tarih: string) {
   })
 }
 
-export default async function HaberDetay({ params }: { params: { slug: string } }) {
-  const haber = await getHaber(params.slug)
+export default async function HaberDetay({ params }: { params: Promise<{ slug: string }> }) {
+  const { slug } = await params
+  const haber = await getHaber(slug)
   if (!haber) notFound()
 
   const ilgili = await getIlgiliHaberler(haber)
